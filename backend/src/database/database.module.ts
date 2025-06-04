@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-
+import 'dotenv/config'
 @Module({
     imports: [
     TypeOrmModule.forRootAsync({
@@ -10,17 +10,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     useFactory: async (configService: ConfigService) => ({
     inject: [ConfigService],
       type: 'mysql',
-      host: configService.getOrThrow('DB_HOST'),
-      port: Number(process.env.DB_PORT),
-      username: process.env.DB_USER, // ✅ Not DB_USERNAME
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
+      host: configService.get<string>('DB_HOST'),
+      port: configService.get<number>('DB_PORT'),
+      username: configService.get<string>('DB_USER'), // ✅ Not DB_USERNAME
+      password: configService.get<string>('DB_PASSWORD'),
+      database:configService.get<string>('DB_NAME'),
       autoLoadEntities: true,
-      synchronize: true,
-      
-    }),
+      synchronize: true,  
+    })
+    ,
     
   }),
-    ],
+    ]
 })
 export class DatabaseModule {}

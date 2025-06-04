@@ -5,10 +5,11 @@ services:
     build: ./backend
     container_name: nest-backend
     ports:
-      - "3000:3000"
+      - "3000:5000"
     depends_on:
       - mysql
-    environment:
+    env_file:
+      - ./backend/.env
     
 
   frontend:
