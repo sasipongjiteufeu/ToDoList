@@ -8,5 +8,6 @@ import { UserApi } from './entities/user-api.entity';
    imports: [TypeOrmModule.forFeature([UserApi])],
   controllers: [UserApiController],
   providers: [UserApiService],
+  exports:[UserApiService]
 })
 export class UserApiModule {}

@@ -10,10 +10,10 @@ import { Repository } from 'typeorm';
 export class UserApiService {
   constructor(
     @InjectRepository(UserApi)
-    private readonly userApiRepository: Repository<UserApi>,) {}
-  
+    private readonly userApiRepository: Repository<UserApi>,) { }
+
   Register_User(createUserApiDto: CreateUserApiDto) {
-    console.log('Registering user with data:', createUserApiDto);  
+    console.log('Registering user with data:', createUserApiDto);
     try {
       const NewUser = this.userApiRepository.create(createUserApiDto);
       return this.userApiRepository.save(NewUser);
@@ -22,20 +22,20 @@ export class UserApiService {
       throw new Error('User registration failed');
     }
   }
-
-  findAll() {
-    return `This action returns all userApi`;
+  async Login_User(createUserApiDto: CreateUserApiDto) {
+      try {
+        const Login_request = await this.userApiRepository.findOneBy({
+          username: createUserApiDto.username,
+          password: createUserApiDto.password,
+        });
+        return Login_request;
+      }
+      catch (error) {
+      console.error('Error logging in user:', error);
+      throw new Error('User login failed');
+      }
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} userApi`;
-  }
 
-  update(id: number, updateUserApiDto: UpdateUserApiDto) {
-    return `This action updates a #${id} userApi`;
-  }
 
-  remove(id: number) {
-    return `This action removes a #${id} userApi`;
-  }
-}

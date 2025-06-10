@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { AppController } from './app.controller';
 import { DatabaseModule } from './database/database.module';
 import { UserApiModule } from './user-api/user-api.module';
+import { AuthModule } from './auth/auth.module';
 
 
 @Module({
@@ -15,10 +16,9 @@ imports: [
     envFilePath: '.env',
   }),
   DatabaseModule,
-  UserApiModule
+  UserApiModule,
+  AuthModule
 ],
-  controllers: [AppController],
-    providers: [AppService],
 })
 
 export class AppModule {
