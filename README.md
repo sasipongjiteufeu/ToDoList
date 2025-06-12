@@ -1,0 +1,1 @@
+   This project was created to enhance web development skills and deepen technical knowledge. It is a Todolist system with a backend developed using Nest.js (TypeScript), and a frontend using React and Tailwind CSS (frontend in progress). The entire system is containerized and run through Docker for development and deployment simulation.
