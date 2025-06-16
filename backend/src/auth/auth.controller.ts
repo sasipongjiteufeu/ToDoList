@@ -4,12 +4,21 @@ import { CreateUserApiDto } from 'src/user-api/dto/create-user-api.dto';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private authService: AuthService) {}
+    constructor(private authService: AuthService) { }
 
     @HttpCode(HttpStatus.OK)
     @Post('login')
-    signIn(@Body() signInDto : CreateUserApiDto) {
-        return this.authService.signIn(signInDto.username, signInDto.password);
+    signIn(@Body() signInDto: CreateUserApiDto) {
+        if (!signInDto.username && !signInDto.password) {
+            throw new Error('Username and password are required for login');
+        } 
+        else if (signInDto.username && !signInDto.password) {
+            throw new Error('Password is required for login');
+        }
+        else if (signInDto.username && signInDto.password) {
+            return this.authService.signIn(signInDto.username, signInDto.password);
+        }
+        throw new Error('Invalid login credentials');
     }
-    
+
 }

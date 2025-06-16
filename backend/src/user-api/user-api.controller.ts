@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { UserApiService } from './user-api.service';
 import { CreateUserApiDto } from './dto/create-user-api.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 
 @Controller('user-api')
@@ -11,6 +12,7 @@ export class UserApiController {
   Register(@Body() createUserApiDto: CreateUserApiDto) {
     return this.userApiService.Register_User(createUserApiDto);
   }
+
   @Post('Login_User')
   async Login_User(@Body() createUserApiDto: CreateUserApiDto) {
 
@@ -21,5 +23,13 @@ export class UserApiController {
       return this.userApiService.Login_User(createUserApiDto);
     }
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('Get_All_Users')
+  Get_All_Users() {
+    return this.userApiService.Get_All_Users();
+  }
+
+  
 
 }

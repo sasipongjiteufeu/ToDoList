@@ -24,18 +24,28 @@ export class UserApiService {
   }
   async Login_User(createUserApiDto: CreateUserApiDto) {
       try {
-        const Login_request = await this.userApiRepository.findOneBy({
+        const Login_Requst = await this.userApiRepository.findOneBy({
           username: createUserApiDto.username,
           password: createUserApiDto.password,
-        });
-        return Login_request;
+        })
+        return Login_Requst;
       }
       catch (error) {
       console.error('Error logging in user:', error);
       throw new Error('User login failed');
       }
     }
+  async Get_All_Users() {
+    try {
+      const users = await this.userApiRepository.find();
+      const usersWithoutPasswords = users.map(({ password, ...user }) => user);
+      return usersWithoutPasswords;
+    }
+    catch (error) {
+      console.error('Error fetching all users:', error);
+      throw new Error('Failed to fetch users');
+    }
   }
-
+}
 
 

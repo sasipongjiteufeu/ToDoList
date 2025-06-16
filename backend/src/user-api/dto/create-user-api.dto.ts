@@ -1,7 +1,10 @@
-import { IsString, IsEmail, IsEmpty } from 'class-validator';
+import { IsString, IsEmail, IsEmpty, IsNumber } from 'class-validator';
 
 
 export class CreateUserApiDto {
+
+
+
 @IsEmpty()
 @IsString()
   username: string;
