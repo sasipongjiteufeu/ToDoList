@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, ObjectType, ManyToMany, JoinTab
 import { RoleEntity } from "./role.entity";
 @Entity()
 export class UserApi {
+
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -14,12 +15,13 @@ export class UserApi {
     @Column({ type: 'varchar', length: 100, unique: true })
     password: string;
 
-    @ManyToMany(() => RoleEntity, (role) => role.users)
+    @ManyToMany(() => RoleEntity, (role) => role.users,{eager: true})
     @JoinTable({
         name: 'user_roles', // name of the pivot table
         joinColumn: { name: 'user_id', referencedColumnName: 'id' },
         inverseJoinColumn: { name: 'role_id', referencedColumnName: 'id' },
     })
+
     roles: RoleEntity[];
 
 }

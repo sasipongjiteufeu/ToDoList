@@ -1,7 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe } from '@nestjs/common';
 import { UserApiService } from './user-api.service';
 import { CreateUserApiDto } from './dto/create-user-api.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Roles } from 'src/auth/Role/roles.decorator';
+import { Role } from 'src/auth/Role/role.enum';
+import { RolesGuard } from 'src/auth/Role/roles.guard';
+import { CreateRoleDto } from './dto/create-Role.dto';
 
 
 @Controller('user-api')
@@ -30,6 +34,11 @@ export class UserApiController {
     return this.userApiService.Get_All_Users();
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Post('Give_admin')
+  getAdminContent(@Param('username') username: string,@Body() RoleDto: CreateRoleDto,) {
+    return this.userApiService.assignRoleToUser(username, RoleDto.roleName);
+  }
   
 
 }
