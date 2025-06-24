@@ -1,2 +1,18 @@
+# Dependency directories
 node_modules/
+
+# Production build folder
+build/
+dist/
+
+# Misc
+.env
+.DS_Store
+*.swo
+*.swp
+*.zip
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 .git/

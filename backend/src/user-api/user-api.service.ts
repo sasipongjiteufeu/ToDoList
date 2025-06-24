@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserApiDto } from './dto/create-user-api.dto';
 import { UpdateUserApiDto } from './dto/update-user-api.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,7 +7,7 @@ import { Repository } from 'typeorm';
 import { Role } from 'src/auth/Role/role.enum';
 import { RoleEntity } from './entities/role.entity';
 import { CreateRoleDto } from './dto/create-Role.dto';
-
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserApiService {
@@ -19,30 +19,63 @@ export class UserApiService {
     private readonly roleRepository: Repository<RoleEntity>,
   ) { }
 
-  Register_User(createUserApiDto: CreateUserApiDto) {
+  async Register_User(createUserApiDto: CreateUserApiDto): Promise<UserApi> {
     console.log('Registering user with data:', createUserApiDto);
     try {
-      const NewUser = this.userApiRepository.create(createUserApiDto);
-      return this.userApiRepository.save(NewUser);
+       const { username, email, password } = createUserApiDto;
+
+    // Check if user already exists
+    const existingUser = await this.userApiRepository.findOne({ where: [{ username }, { email }] });
+    if (existingUser) {
+      throw new ConflictException('Username or email already exists');
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // --- THIS IS THE FIX ---
+
+    // 1. Find the default 'USER' role in the database.
+    const defaultRole = await this.roleRepository.findOne({ where: { name: Role.User } });
+    if (!defaultRole) {
+      throw new Error('Default user role not found. Please seed the roles in the database.');
+    }
+    
+    // 2. Create the new user instance
+    const newUser = this.userApiRepository.create({
+      username,
+      email,
+      password: hashedPassword,
+      // 3. Assign the found role to the user's roles array.
+      roles: [defaultRole],
+    });
+
+    // 4. Save the new user with their assigned role.
+    return this.userApiRepository.save(newUser);
     } catch (error) {
       console.error('Error registering user:', error);
       throw new Error('User registration failed');
     }
   }
   async Login_User(createUserApiDto: CreateUserApiDto) {
-      try {
-        const Login_Requst = await this.userApiRepository.findOneBy({
-          username: createUserApiDto.username,
-          password: createUserApiDto.password,
-        })
-        return Login_Requst;
+    const user = await this.userApiRepository.findOne({
+      where: { username: createUserApiDto.username },
+      relations: ['roles'],
+    });
+      if (!user) {
+        return null;
       }
-      catch (error) {
-      console.error('Error logging in user:', error);
-      throw new Error('User login failed');
-      }
+      const isPasswordMatching = await bcrypt.compare(
+      createUserApiDto.password,
+      user.password,
+    );
+    
+    return isPasswordMatching ? user : null;
+
     }
-     async assignRoleToUser(username: string, roleName: Role): Promise<UserApi> {
+    
+
+    async assignRoleToUser(username: string, roleName: Role): Promise<UserApi> {
     const user = await this.userApiRepository.findOne({
       where: { username: username },
       relations: ['roles'], // Explicitly load relations

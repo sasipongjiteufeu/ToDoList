@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, ObjectType, ManyToMany, JoinTable } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, ObjectType, ManyToMany, JoinTable, OneToMany } from "typeorm";
 import { RoleEntity } from "./role.entity";
+import { Todo } from "src/todos/entities/todo.entity";
 @Entity()
 export class UserApi {
 
@@ -15,6 +16,9 @@ export class UserApi {
     @Column({ type: 'varchar', length: 100, unique: true })
     password: string;
 
+    @OneToMany(() => Todo, (todo) => todo.user, { eager: true })
+    todos: Todo[];
+    
     @ManyToMany(() => RoleEntity, (role) => role.users,{eager: true})
     @JoinTable({
         name: 'user_roles', // name of the pivot table
@@ -22,6 +26,7 @@ export class UserApi {
         inverseJoinColumn: { name: 'role_id', referencedColumnName: 'id' },
     })
 
+    
     roles: RoleEntity[];
 
 }

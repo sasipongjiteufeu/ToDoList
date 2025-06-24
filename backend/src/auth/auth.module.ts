@@ -16,7 +16,7 @@ import { JwtAuthGuard } from './jwt-auth.guard';
     signOptions: { expiresIn: '1h' },
   })],
   controllers: [AuthController,],
-  providers: [AuthService, JwtStrategy,JwtAuthGuard],
+  providers: [AuthService, JwtStrategy, JwtAuthGuard],
   exports : [JwtAuthGuard],
 })
 export class AuthModule {}

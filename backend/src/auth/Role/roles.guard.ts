@@ -8,28 +8,54 @@ export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    // Get the required roles from the custom @Roles() decorator
-    const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+  // --- DEBUGGING LOGS ---
+  console.log('--- RolesGuard Activated ---');
 
-    // If no roles are required, allow access
-    if (!requiredRoles) {
-      return true;
-    }
+  const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
+    context.getHandler(),
+    context.getClass(),
+  ]);
 
-    // Get the user object from the request (attached by a previous guard, e.g., JwtAuthGuard)
-    const { user } = context.switchToHttp().getRequest();
+  // --- DEBUGGING LOGS ---
+  console.log('Required Roles:', requiredRoles);
 
-    // If there's no user, deny access (should be handled by AuthGuard, but good to be safe)
-    if (!user || !user.roles) {
-        return false;
-    }
-    
-    // Check if the user's roles include at least one of the required roles
-    // The `user.roles` is an array of RoleEntity objects, so we map it to an array of role names
-    const userRoles = user.roles.map((role) => role.name);
-    return requiredRoles.some((role) => userRoles.includes(role));
+  if (!requiredRoles) {
+    console.log('No roles required. Access granted.');
+    return true;
   }
+
+  const { user } = context.switchToHttp().getRequest();
+
+  // --- DEBUGGING LOGS ---
+  console.log('User object from request:', user);
+
+  if (!user || !user.roles) {
+    console.log('Guard failed: User object or user.roles is missing.');
+    return false;
+  }
+  const hasRequiredRole = requiredRoles.some((requiredRole) => user.roles.some((userRole) => userRole.name === requiredRole));
+  // --- DEBUGGING LOGS ---
+  console.log('Does user have required role?', hasRequiredRole);
+   if (hasRequiredRole) {
+    console.log('Access granted by RolesGuard.');
+  } else {
+    console.log('Access DENIED by RolesGuard.');
+  }
+  
+  return hasRequiredRole;
+  /*
+  const hasRequiredRole = requiredRoles.some((role) => user.roles.includes(role));
+   
+  
+  // --- DEBUGGING LOGS ---
+  console.log('Does user have required role?', hasRequiredRole);
+  
+  if (hasRequiredRole) {
+    console.log('Access granted by RolesGuard.');
+  } else {
+    console.log('Access DENIED by RolesGuard.');
+  }
+
+  return hasRequiredRole;*/
+}
 }
